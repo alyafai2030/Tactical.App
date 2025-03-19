@@ -16,12 +16,7 @@
             "background_color": "#f4f4f4",
             "theme_color": "#4CAF50",
             "description": "تطبيق لإدارة مراحل الرماية وتسجيل النتائج",
-            "icons": [
-                {
-                    "src": "tc.png",
-                    "sizes": "40x40",
-                    "type": "image/png"
-                }
+           
             ],
             "lang": "ar",
             "dir": "rtl"
@@ -31,10 +26,11 @@
         body { font-family: Arial, sans-serif; background-color: #f0f0f0; margin: 0; padding: 20px; direction: rtl; }
         .container { max-width: 400px; margin: 0 auto; background-color: white; border: 1px solid #ccc; padding: 10px; }
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-        .header h1 { font-size: 18px; margin: 0;}
-        .button { background-color: #007bff; color: white; padding: 10px; text-align: center; margin: 10px 0; display: block; border-radius: 5px; cursor: pointer; }
+        .header h1 { font-size: 18px; margin: 5;}
+        .button { background-color: #575a5c; color: white; padding: 10px; text-align: center; margin: 10px 0; display: block; border-radius: 5px; cursor: pointer; }
         .button:hover { background-color: #0056b3; }
-        .button.secondary { background-color: #6c757d; }
+        .button.secondary { background-color: #575a5c; }
+        .button.button.secondary:hover { background-color: #0c77e8; }
         .stage, .shooter, .team { border: 1px solid #ccc; padding: 10px; margin: 10px 0; background-color: #f9f9f9; }
         .stage a, .shooter a { text-decoration: none; color: black; display: block; cursor: pointer; }
         .stage a:hover, .shooter a:hover { background-color: #e0e0e0; }
@@ -73,6 +69,8 @@
         .stage-actions .delete-btn { background-color: #dc3545; color: white; }
         .stage-actions .delete-btn:hover { background-color: #b02a37; }
         .stage-divider { border: 0; height: 1px; background: #ccc; margin: 10px 0; }
+        .view-results-page .delete-btn:hover { background-color: #b02a37; }
+        
         /* تنسيق جديد لـ top-controls */
         .top-controls {
             display: flex;
@@ -88,9 +86,8 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .top-controls .back-btn:hover {
-            background-color: #5a6268;
-        }
+        
+       
         .top-controls .save-btn {
             background-color: #007bff; /* لون زر الحفظ */
             color: white;
@@ -229,15 +226,22 @@
     <!-- Home Page -->
     <div id="home-page" class="page active">
         <div class="container">
-            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                <img src="tc.png" alt="رمز الرماية" style="width: 40px; height: 40px; margin-left: 10px;">
-                <h1 style="text-align: center; color: #333; margin: 0;">الرماية التكتيكية</h1>
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                
+                <h1 style="text-align: center; color: #1438c6; margin: 0;">الرماية التكتيكية</h1>
             </div>
-            <div class="button" onclick="showPage('enter-scores-page')" id="enter-scores-btn">إدخال النتائج</div>
-            <div class="button secondary" onclick="showPage('edit-shooters-page')" id="edit-shooters-btn">تعديل الرماة</div>
-            <div class="button secondary" onclick="showPage('build-stages-page')" id="build-stages-btn">بناء المراحل</div>
-            <div class="button secondary" onclick="showPage('view-results-page')" id="view-results-btn">عرض النتائج</div>
+            <img src="tr.png" alt="رمز الر " style="width: 100px; height: 100px; margin-right: 150px;">       
+            <div class="button" onclick="showPage('enter-scores-page')" id="enter-scores-btn" style="font-size: 22px;">إدخال النتائج</div>
+            <div class="button secondary" onclick="showPage('edit-shooters-page')" id="edit-shooters-btn" style="font-size: 22px;"> الرماة</div>
+            <div class="button secondary" onclick="showPage('build-stages-page')" id="build-stages-btn" style="font-size: 22px;"> المراحل</div>
+            <div class="button secondary" onclick="showPage('view-results-page')" id="view-results-btn" style="font-size: 22px;"> النتائج</div>
             <div class="controls"></div>
+            <span style="color: #007bff; font-size: 20px;">محمد اليافعي</span>
+          
+            
+            
+            
+
         </div>
     </div>
 
@@ -246,7 +250,7 @@
         <div class="container">
             <div class="header">
                 <div onclick="showPage('home-page')" id="back-btn">رجوع</div>
-                <h1 id="enter-scores-title">إدخال النتائج</h1>
+                <h1 id="enter-scores-title">اختار المرحلة</h1>
                 <span></span>
             </div>
             <div id="stagesList1">
@@ -418,39 +422,47 @@
         </div>
     </div>
 
+    
     <!-- View Results Page -->
-    <div id="view-results-page" class="page">
-        <div class="container">
-            <div class="header">
-                <div onclick="showPage('home-page')">رجوع</div>
-                <h1>عرض النتائج</h1>
-                <span></span>
-            </div>
-            <div class="form-group">
-                <label for="stage-filter">اختر المرحلة:</label>
-                <select id="stage-filter" onchange="loadResults()">
-                    <option value="">الكل</option>
-                    <!-- المراحل سيتم ملؤها ديناميكيًا -->
-                </select>
-            </div>
-            <div class="results-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>اسم الرامي</th>
-                            <th>المرحلة</th>
-                            <th>الوقت</th>
-                            <th>النقاط</th>
-                            <th>Hit Factor</th>
-                            <th>النسبة المئوية</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsTable"></tbody>
-                </table>
-            </div>
+<div id="view-results-page" class="page">
+    <div class="container">
+        <div class="header">
+            <div onclick="showPage('home-page')">رجوع</div>
+            <h1 style="margin-right:130px;"> النتائج</h1>
+            <!-- زر حذف جميع النتائج -->
+            <div class="button secondary" style="background-color: #dd3e0d; margin-right: 90px; color: white;" onclick="clearAllResults()">حذف الجميع </div>
+            <span></span>
+        </div>
+        <div class="form-group">
+            <label for="stage-filter">اختر المرحلة:</label>
+            
+            <select id="stage-filter" onchange="loadResults()">
+                <option value="">الكل</option>
+                <!-- المراحل سيتم ملؤها ديناميكيًا -->
+            </select>
+        </div>
+        <!-- أزرار الإجراءات -->
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            
+            <div class="button" style="background-color: #007bff;" onclick="shareResults()">مشاركة النتائج</div>
+        </div>
+        <div class="results-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>اسم الرامي</th>
+                        <th>المرحلة</th>
+                        <th>الوقت</th>
+                        <th>النقاط</th>
+                        <th>Hit Factor</th>
+                        <th>النسبة المئوية</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTable"></tbody>
+            </table>
         </div>
     </div>
-
+</div>
     <!-- JavaScript -->
     <script>
         let timerInterval = null;
@@ -474,9 +486,9 @@
             ar: {
                 title: "الرماية التكتيكية",
                 enterScores: "إدخال النتائج",
-                editShooters: "تعديل الرماة",
-                buildStages: "بناء المراحل",
-                viewResults: "عرض النتائج",
+                editShooters: " الرماة",
+                buildStages: " المراحل",
+                viewResults: " النتائج",
                 back: "رجوع",
                 save: "حفظ",
                 start: "تشغيل",
@@ -490,7 +502,7 @@
                 editStage: "تعديل المرحلة",
                 addStage: "إضافة مرحلة",
                 addStageTitle: "إضافة مرحلة",
-                enterScoresTitle: "إدخال النتائج",
+                enterScoresTitle: "اختار المرحلة",
                 editShootersTitle: "الرماة",
                 addShooterTitle: "إضافة رامي",
                 firstNameLabel: "الاسم الأول",
@@ -1524,6 +1536,107 @@
                 alert('مشكلة في التخزين المحلي. تأكد من إعدادات الخصوصية في المتصفح.');
             }
         });
+
+        function shareResults() {
+            const resultsTable = document.getElementById('resultsTable');
+            const stageFilter = document.getElementById('stage-filter');
+            if (!resultsTable || !stageFilter) {
+                console.error('جدول النتائج أو فلتر المراحل غير موجود!');
+                alert('خطأ في تحميل النتائج للمشاركة.');
+                return;
+            }        
+
+            // جمع البيانات من الجدول
+            const rows = resultsTable.querySelectorAll('tr');
+            if (rows.length === 0) {
+                alert('لا توجد نتائج للمشاركة!');
+                return;
+            }        
+
+            // إنشاء محتوى CSV
+            let csvContent = '\uFEFF'; // إضافة BOM لدعم اللغة العربية في Excel
+            csvContent += 'اسم الرامي,المرحلة,الوقت,النقاط,Hit Factor,النسبة المئوية\n'; // رأس الجدول
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowData = [
+                    cells[0].textContent,
+                    cells[1].textContent,
+                    cells[2].textContent,
+                    cells[3].textContent,
+                    cells[4].textContent,
+                    cells[5].textContent
+                ].map(cell => `"${cell}"`); // وضع كل قيمة بين علامات اقتباس للتعامل مع الفواصل داخل النص
+                csvContent += rowData.join(',') + '\n';
+            });        
+
+            // إنشاء ملف CSV
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const fileName = `نتائج_الرماية_${stageFilter.value || 'جميع_المراحل'}.csv`;        
+
+            // محاولة مشاركة الملف باستخدام Web Share API
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [] })) {
+                const file = new File([blob], fileName, { type: 'text/csv' });
+                navigator.share({
+                    title: 'نتائج الرماية التكتيكية',
+                    files: [file],
+                })
+                .then(() => {
+                    console.log('تمت مشاركة الملف بنجاح');
+                    URL.revokeObjectURL(url);
+                })
+                .catch((error) => {
+                    console.error('خطأ في مشاركة الملف:', error);
+                    fallbackToDownload(url, fileName);
+                });
+            } else {
+                // الرجوع إلى التنزيل المباشر إذا لم يكن Web Share مدعومًا
+                fallbackToDownload(url, fileName);
+            }
+        }        
+
+        function fallbackToDownload(url, fileName) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+        
+        function fallbackToDownload(url, fileName) {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }       
+        function fallbackToClipboard(text) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    alert('تم نسخ النتائج إلى الحافظة! يمكنك لصقها في أي مكان.');
+                })
+                .catch((error) => {
+                    console.error('خطأ في نسخ النص إلى الحافظة:', error);
+                    alert('حدث خطأ أثناء نسخ النتائج. يرجى المحاولة مرة أخرى.');
+                });
+        }
+
+        function clearAllResults() {
+            if (confirm('هل أنت متأكد من حذف جميع النتائج؟ لا يمكن التراجع عن هذا الإجراء!')) {
+                try {
+                    localStorage.removeItem('shooterScores'); // حذف جميع النتائج فقط
+                    alert('تم حذف جميع النتائج بنجاح!');
+                    loadResults(); // إعادة تحميل صفحة النتائج لعكس التغيير
+                } catch (e) {
+                    console.error('خطأ أثناء حذف النتائج:', e);
+                    alert('حدث خطأ أثناء حذف النتائج. يرجى المحاولة مرة أخرى.');
+                }
+            }
+        }
         function switchLanguage(lang) {
             currentLang = lang;
             document.querySelector('title').textContent = translations[lang].title;
