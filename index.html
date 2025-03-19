@@ -1544,18 +1544,23 @@
                 console.error('جدول النتائج أو فلتر المراحل غير موجود!');
                 alert('خطأ في تحميل النتائج للمشاركة.');
                 return;
-            }        
-
+            }
+        
             // جمع البيانات من الجدول
             const rows = resultsTable.querySelectorAll('tr');
             if (rows.length === 0) {
                 alert('لا توجد نتائج للمشاركة!');
                 return;
-            }        
-
-            // إنشاء محتوى CSV
-            let csvContent = '\uFEFF'; // إضافة BOM لدعم اللغة العربية في Excel
-            csvContent += 'اسم الرامي,المرحلة,الوقت,النقاط,Hit Factor,النسبة المئوية\n'; // رأس الجدول
+            }
+        
+            // إنشاء نص منسق باستخدام مسافات
+            let shareText = `نتائج الرماية التكتيكية (${stageFilter.value || 'جميع المراحل'}):\n\n`;
+            // تحديد أطوال الأعمدة لضمان التنسيق
+            const colWidths = [15, 15, 10, 10, 12, 15]; // أطوال الأعمدة بالحروف
+            const headers = ['اسم الرامي', 'المرحلة', 'الوقت', 'النقاط', 'Hit Factor', 'النسبة المئوية'];
+            shareText += headers.map((header, i) => header.padEnd(colWidths[i])).join('') + '\n';
+            shareText += '-'.repeat(colWidths.reduce((a, b) => a + b, 0)) + '\n';
+        
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 const rowData = [
@@ -1565,44 +1570,26 @@
                     cells[3].textContent,
                     cells[4].textContent,
                     cells[5].textContent
-                ].map(cell => `"${cell}"`); // وضع كل قيمة بين علامات اقتباس للتعامل مع الفواصل داخل النص
-                csvContent += rowData.join(',') + '\n';
-            });        
-
-            // إنشاء ملف CSV
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const fileName = `نتائج_الرماية_${stageFilter.value || 'جميع_المراحل'}.csv`;        
-
-            // محاولة مشاركة الملف باستخدام Web Share API
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [] })) {
-                const file = new File([blob], fileName, { type: 'text/csv' });
+                ].map((cell, i) => cell.padEnd(colWidths[i]));
+                shareText += rowData.join('') + '\n';
+            });
+            shareText += '\nتم إنشاء هذه النتائج باستخدام تطبيق الرماية التكتيكية';
+        
+            // محاولة استخدام Web Share API
+            if (navigator.share) {
                 navigator.share({
                     title: 'نتائج الرماية التكتيكية',
-                    files: [file],
+                    text: shareText,
                 })
-                .then(() => {
-                    console.log('تمت مشاركة الملف بنجاح');
-                    URL.revokeObjectURL(url);
-                })
+                .then(() => console.log('تمت المشاركة بنجاح'))
                 .catch((error) => {
-                    console.error('خطأ في مشاركة الملف:', error);
-                    fallbackToDownload(url, fileName);
+                    console.error('خطأ في المشاركة:', error);
+                    fallbackToClipboard(shareText);
                 });
             } else {
-                // الرجوع إلى التنزيل المباشر إذا لم يكن Web Share مدعومًا
-                fallbackToDownload(url, fileName);
+                // الرجوع إلى نسخ النص إلى الحافظة
+                fallbackToClipboard(shareText);
             }
-        }        
-
-        function fallbackToDownload(url, fileName) {
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
         }
         
         function fallbackToDownload(url, fileName) {
