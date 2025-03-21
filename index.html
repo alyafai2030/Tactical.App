@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4CAF50">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
    
     <title>الرماية التكتيكية</title>
     <script type="application/json" id="manifest">
@@ -92,7 +92,7 @@
         
        
         .top-controls .save-btn {
-            background-color: #007bff; /* لون زر الحفظ */
+            background-color: #273c75; /* لون زر الحفظ */
             color: white;
             padding: 8px 16px;
             border: none;
@@ -100,12 +100,12 @@
             cursor: pointer;
         }
         .top-controls .save-btn:hover {
-            background-color: #273c75;
+            background-color: #0652DD; /* لون الزر عند التمرير */
         }
           .score-btn {
              font-size: 16px; /* حجم خط مناسب للأرقام داخل الزر */
-             width: 70px; /* عرض الزر */
-             height: 40px; /* ارتفاع الزر */
+             width: 50px; /* عرض الزر */
+             height: 30px; /* ارتفاع الزر */
              border: none;
              background-color: #ddd; /* اللون الرمادي الافتراضي */
              cursor: pointer;
@@ -157,7 +157,7 @@
             border: none;
             border-radius: 3px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 16px;
         }
         .timer-controls .start-btn {
             background-color: #4CAF50;
@@ -168,7 +168,7 @@
             color: white;
         }
         .timer-controls .reset-btn {
-            background-color: #ff9800;
+            background-color: #EE5A24;
             color: white;
         }
         .procedurals-controls {
@@ -181,15 +181,17 @@
             border: none;
             border-radius: 3px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 14px;
         }
         .procedurals-controls .decrease-btn {
             background-color: #dc3545;
             color: white;
+            
         }
         .procedurals-controls .increase-btn {
             background-color: #4CAF50;
             color: white;
+            
         }
 
         
@@ -287,6 +289,28 @@
             font-weight: bold;
             color: #30336b; /* لون مشابه للأزرار الأخرى */
         }
+        /* تنسيق عام لجميع أزرار الحفظ */
+        .save-btn {
+            background-color: #007bff; /* لون الخلفية */
+            color: white; /* لون النص */
+            padding: 8px 16px; /* الحشوة */
+            border: none; /* إزالة الحدود */
+            border-radius: 5px; /* زوايا دائرية */
+            cursor: pointer; /* مؤشر الماوس */
+            font-size: 24px; /* تكبير حجم الخط */
+            font-weight: bold; /* خط عريض */
+        }
+        
+        .save-btn:hover {
+            background-color: #0056b3; /* لون الخلفية عند التمرير */
+        }
+        
+        /* تخصيص زر حفظ التعديل (إذا كنت تريد تنسيقًا مختلفًا) */
+        #edit-stage-btn.save-btn {
+            font-size: 22px; /* حجم خط أصغر قليلاً لزر "حفظ التعديل" إذا أردت تمييزه */
+        }
+        
+        
 </style>
     </style>
 </head>
@@ -298,22 +322,17 @@
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
             <h1 style="text-align: center; color: #0f0f10; margin: 0;">الرماية التكتيكية</h1>
         </div>
-        <img src="tr.png" alt="رمز الر " style="width: 100px; height: 100px; margin-right: 150px;">       
-        <div class="button" onclick="showPage('enter-scores-page')" id="enter-scores-btn" style="font-size: 22px;">
-            <img src="enter-scores-icon.png" alt="أيقونة إدخال النتائج" class="button-icon"> إدخال النتائج
+        <img src="tr.png" alt="رمز الر " style="width: 100px; height: 100px; margin-right: 150px;">     
+        <div class="button" onclick="showPage('enter-scores-page')" id="enter-scores-btn" style="font-size: 22px; text-align: center;" >
         </div>
-        <div class="button secondary" onclick="showPage('edit-shooters-page')" id="edit-shooters-btn" style="font-size: 22px;" >
-            <img src="edit-shooters-icon.png" alt="أيقونة الرماة" class="button-icon"> الرماة
+        <div class="button secondary" onclick="showPage('edit-shooters-page')" id="edit-shooters-btn" style="font-size: 22px;" > 
         </div>
-        <div class="button secondary" onclick="showPage('build-stages-page')" id="build-stages-btn" style="font-size: 22px;">
-            <img src="build-stages-icon.png" alt="أيقونة المراحل" class="button-icon"> المراحل
+        <div class="button secondary" onclick="showPage('build-stages-page')" id="build-stages-btn" style="font-size: 22px;">   
         </div>
-        <div class="button secondary" onclick="showPage('view-results-page')" id="view-results-btn" style="font-size: 22px;">
-            <img src="view-results-icon.png" alt="أيقونة النتائج" class="button-icon"> النتائج
+        <div class="button secondary" onclick="showPage('view-results-page')" id="view-results-btn" style="font-size: 22px;">          
         </div>
         <div class="controls"></div>
-        <span style="color: #0d0d0d; font-size: 20px;">محمد اليافعي</span>
-        
+        <span style="color: #0d0d0d; font-size: 20px;">محمد اليافعي</span>      
     </div>
     
 </div>
@@ -325,7 +344,8 @@
         <div class="container">
             <div class="header">
                 <div onclick="showPage('home-page')" id="back-btn">رجوع</div>
-                <h1 id="enter-scores-title">اختار المرحلة</h1>
+                <h1 id="enter-scores-title" style="margin-right: 100px;">اختار المرحلة</h1>
+                <img src="stage.png" alt="رمز الر " style="width: 20px; height: 20px; margin-right: 110px; color: #f7f6f6;"> 
                 <span></span>
             </div>
             <div id="stagesList1">
@@ -360,7 +380,7 @@
         <div class="top-controls"> 
             <div onclick="showPage('stage-detail-page')" id="back-btn-stage-detail">رجوع</div>
             <h2>ادخال النتائج</h2>
-            <button class="save-btn" onclick="saveShooterScore()">حفظ النتيجة</button>
+            <button class="save-btn" onclick="saveShooterScore()" style="font-size: 14px;">حفظ النتيجة</button>
         </div>
         <div style="margin-bottom: 15px;">
             <div style="font-weight: bold;">الرامي: <span id="shooter-name"></span></div>
@@ -371,7 +391,7 @@
             <div class="timer-controls">
                 <input type="text" id="manualTimeInput" class="time-input"  placeholder=" الوقت" oninput="updateManualTime(this)">
                 <span id="timerDisplay" style="font-size: 14px; font-weight: bold; width: 60px; text-align: center;">00.00</span>
-                <button id="toggleTimerBtn" onclick="toggleTimer()" style="background-color: #30336b; color: white;">تشغيل</button>
+                <button id="toggleTimerBtn" onclick="toggleTimer()" style="background-color: #30336b; color: white; font-style:normal; font-weight:lighter; font-size: 14px;">تشغيل</button>
                 <button class="reset-btn" onclick="resetTimer()">إعادة</button>
             </div>
             <div class="procedurals-controls">
@@ -404,13 +424,13 @@
         <div class="container">
             <div class="header">
                 <div onclick="showPage('home-page')">رجوع</div>
-                <h1 id="edit-shooters-title">الرماة</h1>
-                <span></span>
+                <h1 id="edit-shooters-title" style="margin-right:  10px;">الرماة</h1>
+                <div onclick="showPage('add-shooter-page')" style="margin-left: 20px;"> إضافة + </div>
             </div>
             <div id="shootersList">
                 <!-- سيتم ملؤها ديناميكيًا -->
             </div>
-            <div class="button" onclick="showPage('add-shooter-page')">إضافة رامي</div>
+            
         </div>
     </div>
 
@@ -420,23 +440,23 @@
             <div class="header">
                 <div onclick="showPage('edit-shooters-page')">رجوع</div>
                 <h1 id="add-shooter-title">إضافة رامي</h1>
-                <button onclick="saveShooter()">حفظ</button>
+                <div onclick="saveShooter()" style="font-size: 24px; margin-left: 30px;">حفظ</div>
             </div>
             <div class="form-group">
                 <label id="first-name-label">الاسم الأول</label>
-                <input type="text" id="firstName">
+                <input type="text" id="firstName" placeholder="الاسم الاول">
             </div>
             <div class="form-group">
                 <label id="last-name-label">الاسم الأخير</label>
-                <input type="text" id="lastName">
+                <input type="text" id="lastName" placeholder="الاسم الاخير">
             </div>
             <div class="form-group">
                 <label id="number-label">الرقم</label>
-                <input type="text" id="shooterNumber">
+                <input type="text" id="shooterNumber" placeholder="الرقم">
             </div>
             <div class="form-group">
                 <label id="team-label">الفريق</label>
-                <input type="text" id="shooterTeam">
+                <input type="text" id="shooterTeam" placeholder="الفريق">
             </div>
         </div>
     </div>
@@ -447,7 +467,7 @@
             <div class="header">
                 <div onclick="showPage('home-page')">رجوع</div>
                 <h1 style="margin-right:90px;">بناء المراحل</h1>
-                <div class="button" style="background-color: #30336b; margin-right: 30px;" onclick="showAddStagePage()"> إضافة مرحلة " <span id="nextStageNumber">1</span></div>        
+                <div  onclick="showAddStagePage()" style="font-size: 24px; margin-right: 70px;">إضافة +</div>        
                 <span></span>
             </div>
             <table class="stages-table" id="stagesList">
@@ -472,9 +492,8 @@
         <div class="container">
             <div class="header">
                 <div onclick="showPage('build-stages-page')" id="add-stage-back-btn">رجوع</div>
-                <h1 id="add-stage-title">إضافة مرحلة</h1>
-                <button id="edit-stage-btn" onclick="saveStage()" style="display: none;">حفظ التعديل</button>
-                <button id="save-stage-btn" onclick="saveStage()">حفظ</button>
+                <h1 id="add-stage-title">إضافة مرحلة</h1>            
+                <div  onclick="saveStage()" style="font-size: 24px; margin-left: 30px;">حفظ</div>
             </div>
             <div class="form-group">
                 <label id="stage-name-label">المرحلة</label>
@@ -504,9 +523,9 @@
         <div class="container">
             <div class="header">
                 <div onclick="showPage('home-page')">رجوع</div>
-                <h1 style="margin-right:130px;"> النتائج</h1>
+                <h1 style="margin-right:110px;"> النتائج</h1>
                 <!-- زر حذف جميع النتائج -->
-                <div class="button secondary" style="background-color: #c35433; margin-right: 60px; color: white;" onclick="clearAllResults()">حذف الجميع </div>
+                <div class="button secondary" style="background-color: #eb3b5a; margin-right: 60px; color: white; width: 70px; height: 10px;" onclick="clearAllResults()">حذف الجميع </div>
                 <span></span>
             </div>
             <div class="form-group">
@@ -519,8 +538,8 @@
             </div>
             <!-- أزرار الإجراءات -->
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <div class="button" style="background-color: #424eb8;" onclick="shareResults()">مشاركة النتائج</div>
-                <div class="button" style="background-color: #30336b; color:#f5f6fa"  onclick="showPage('shooting-details-page'); loadShootingDetails();">تفاصيل الرماية</div> 
+                <div class="button" style="background-color: #424eb8; width:80px; height: 10px; color: white;" onclick="shareResults()">مشاركة النتائج</div>
+                <div class="button" style="background-color: #30336b; width:80px; height: 10px; color: white;"  onclick="showPage('shooting-details-page'); loadShootingDetails();">تفاصيل الرماية</div> 
                                                                   <!-- تغيير لون خط الزر --> 
             </div>
             <div class="results-table">
@@ -547,7 +566,7 @@
             <div class="header">
                 <div onclick="showPage('view-results-page')">رجوع</div>
                 <h1 style="margin-right:70px;">تفاصيل الرماية</h1>
-                <div class="button" style="background-color: #30336b; margin-right: 30px;" onclick="shareShootingDetails()">مشاركة التفاصيل</div>
+                <div class="button" style="background-color: #30336b; margin-right: 30px; width:90px; height: 10px; color: white" onclick="shareShootingDetails()">مشاركة التفاصيل</div>
                 <span></span>
             </div>
             <div class="form-group">
@@ -559,7 +578,7 @@
                 </select>
                 
             </div>
-            <div class="results-table">
+            <div class="results-table" style="font-size: 12px;">
                 <table>
                     <thead>
                         <tr>
@@ -571,6 +590,7 @@
                             <th>D</th>
                             <th>M</th>
                             <th>NS</th>
+                            <th>النقاط</th>
                             <th>الوقت</th>
                             <th>Hit-F</th>
                             <th>النسبة%</th>
@@ -618,7 +638,8 @@
                 targetsLabel: "الأهداف",
                 stageImageLabel: "صورة المرحلة",
                 saveStage: "حفظ",
-                editStage: "تعديل المرحلة",
+                editStage: " تعديل المرحلة",
+                seveEdit: "حفظ",
                 addStage: "إضافة مرحلة",
                 addStageTitle: "إضافة مرحلة",
                 enterScoresTitle: "اختار المرحلة",
@@ -650,6 +671,7 @@
                 targetsLabel: "Targets",
                 stageImageLabel: "Stage Image",
                 saveStage: "Save",
+                saveEdit: "Save",
                 editStage: "Edit Stage",
                 addStage: "Add Stage",
                 addStageTitle: "Add Stage",
@@ -1816,8 +1838,9 @@
         
             uniqueScores.forEach(score => {
                 const shooter = shooters.find(s => s.id.toString() === score.shooterId.toString());
+                const totalScore = parseInt(score.totalScore) || 0;
                 const hitFactor = parseFloat(score.hitFactor) || 0;
-                const percentage = maxHitFactor > 0 ? ((hitFactor / maxHitFactor) * 100).toFixed(2) : '0.00';
+                const percentage = maxHitFactor > 0 ? ((hitFactor / maxHitFactor) * 100).toFixed(1) : '0.00';
         
                 // حساب إجمالي النتائج لكل نوع (A, C, D, M, NS)
                 let totals = { A: 0, C: 0, D: 0, M: 0, NS: 0 };
@@ -1842,6 +1865,7 @@
                         <td>${totals.D}</td>
                         <td>${totals.M}</td>
                         <td>${totals.NS}</td>
+                        <td>${totalScore}</td>
                         <td>${score.time}</td>
                         <td>${score.hitFactor}</td>
                         <td>${percentage}%</td>
