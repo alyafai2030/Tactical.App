@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#4CAF50">
@@ -332,7 +332,8 @@
         <div class="button secondary" onclick="showPage('view-results-page')" id="view-results-btn" style="font-size: 22px;">          
         </div>
         <div class="controls"></div>
-        <span style="color: #0d0d0d; font-size: 20px;">محمد اليافعي</span>      
+         <img src="my4.png" style="width: 70px; height: 70px; margin-right: 165px;">
+       
     </div>
     
 </div>
@@ -389,7 +390,7 @@
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <div class="timer-controls">
-                <input type="text" id="manualTimeInput" class="time-input"  placeholder=" الوقت" oninput="updateManualTime(this)">
+                <input type="number" id="manualTimeInput" class="time-input" placeholder="الوقت" step="0.01" inputmode="decimal" oninput="updateManualTime(this)">
                 <span id="timerDisplay" style="font-size: 14px; font-weight: bold; width: 60px; text-align: center;">00.00</span>
                 <button id="toggleTimerBtn" onclick="toggleTimer()" style="background-color: #30336b; color: white; font-style:normal; font-weight:lighter; font-size: 14px;">تشغيل</button>
                 <button class="reset-btn" onclick="resetTimer()">إعادة</button>
@@ -525,7 +526,7 @@
                 <div onclick="showPage('home-page')">رجوع</div>
                 <h1 style="margin-right:110px;"> النتائج</h1>
                 <!-- زر حذف جميع النتائج -->
-                <div class="button secondary" style="background-color: #eb3b5a; margin-right: 60px; color: white; width: 70px; height: 10px;" onclick="clearAllResults()">حذف الجميع </div>
+                <div class="button secondary" style="background-color: #eb3b5a; margin-right: 60px; color: white; width: 80px; height: 10px;" onclick="clearAllResults()">حذف الجميع </div>
                 <span></span>
             </div>
             <div class="form-group">
@@ -538,8 +539,8 @@
             </div>
             <!-- أزرار الإجراءات -->
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <div class="button" style="background-color: #424eb8; width:80px; height: 10px; color: white;" onclick="shareResults()">مشاركة النتائج</div>
-                <div class="button" style="background-color: #30336b; width:80px; height: 10px; color: white;"  onclick="showPage('shooting-details-page'); loadShootingDetails();">تفاصيل الرماية</div> 
+                <div class="button" style="background-color: #424eb8; width:90px; height: 10px; color: white;" onclick="shareResults()">مشاركة النتائج</div>
+                <div class="button" style="background-color: #30336b; width:90px; height: 10px; color: white;"  onclick="showPage('shooting-details-page'); loadShootingDetails();">تفاصيل الرماية</div> 
                                                                   <!-- تغيير لون خط الزر --> 
             </div>
             <div class="results-table">
@@ -565,8 +566,8 @@
         <div class="container">
             <div class="header">
                 <div onclick="showPage('view-results-page')">رجوع</div>
-                <h1 style="margin-right:70px;">تفاصيل الرماية</h1>
-                <div class="button" style="background-color: #30336b; margin-right: 30px; width:90px; height: 10px; color: white" onclick="shareShootingDetails()">مشاركة التفاصيل</div>
+                <h1 style="margin-right:60px;">تفاصيل الرماية</h1>
+                <div class="button" style="background-color: #30336b; margin-right: 30px; width:100px; height: 10px; color: white" onclick="shareShootingDetails()">مشاركة التفاصيل</div>
                 <span></span>
             </div>
             <div class="form-group">
@@ -578,7 +579,7 @@
                 </select>
                 
             </div>
-            <div class="results-table" style="font-size: 12px;">
+            <div class="results-table" style="font-size: 11px;">
                 <table>
                     <thead>
                         <tr>
