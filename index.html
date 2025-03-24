@@ -388,10 +388,14 @@
         </div>
         <div style="margin-bottom: 15px;">
             <div style="font-weight: bold;">الرامي: <span id="shooter-name"></span></div>
-            <div style="font-weight: bold;">المرحلة: <span id="stage-name"></span></div>
+            <div style="display: flex; justify-content: flex-start; align-items: center; gap: 0.4em; margin-bottom: 5px;">
+                المرحلة:
+                <span id="stage-name"></span> 
+                <span id="stage-date-in-score" style="color: #30336b;"></span>   
+            </div>
             <div style="font-weight: bold;">الأهداف: <span id="score-progress"></span></div>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
             <div class="timer-controls">
                 <input type="number" id="manualTimeInput" class="time-input" placeholder="الوقت" step="0.01" inputmode="decimal" oninput="updateManualTime(this)">
                 <span id="timerDisplay" style="font-size: 14px; font-weight: bold; width: 60px; text-align: center;">00.00</span>
@@ -536,11 +540,13 @@
             </div>
             <div class="form-group">
                 <label for="stage-filter">اختر المرحلة:</label>
-                
-                <select id="stage-filter" onchange="loadResults()">
-                    <option value="">الكل</option>
-                    <!-- المراحل سيتم ملؤها ديناميكيًا -->
-                </select>
+                <div style="display: flex; justify-content: flex-start; align-items: center; gap: 0.4em;">
+                    <select id="stage-filter" onchange="loadResults(); updateStageDate();"></select>
+                    <span id="stage-date-display" style="color: #30336b;"></span>
+                    <option value=""></option>
+                        <!-- المراحل سيتم ملؤها ديناميكيًا -->
+                    </select>
+                </div>
             </div>
             <!-- أزرار الإجراءات -->
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -576,13 +582,14 @@
                 <span></span>
             </div>
             <div class="form-group">
-                
                 <label for="stage-filter-details">اختر المرحلة:</label>
-                <select id="stage-filter-details" onchange="loadShootingDetails()">
-                    <option value="">الكل</option>
-                    <!-- المراحل سيتم ملؤها ديناميكيًا -->
-                </select>
-                
+                <div style="display: flex; justify-content: flex-start; align-items: center; gap: 0.4em;">
+                    <select id="stage-filter-details" onchange="loadShootingDetails(); updateStageDateDetails();"></select>
+                    <span id="stage-date-display-details" style="color: #30336b;"></span>
+                        <option value=""></option>
+                        <!-- المراحل سيتم ملؤها ديناميكيًا -->
+                    </select>
+                </div>
             </div>
             <div class="results-table" style="font-size: 11px;">
                 <table>
@@ -850,6 +857,37 @@
             }
             showPage('stage-detail-page');
         }
+       
+        function updateStageDateDetails() {
+            const stageFilter = document.getElementById('stage-filter-details');
+            const stageDateDisplay = document.getElementById('stage-date-display-details');
+            if (!stageFilter || !stageDateDisplay) {
+                console.error('عنصر فلتر المراحل أو عنصر عرض التاريخ غير موجود في صفحة تفاصيل الرماية!');
+                return;
+            }
+        
+            const selectedStage = stageFilter.value.trim();
+            if (selectedStage === "") {
+                stageDateDisplay.textContent = "";
+                return;
+            }
+        
+            let stages = [];
+            try {
+                const stagesData = localStorage.getItem('stages');
+                stages = stagesData ? JSON.parse(stagesData) : [];
+            } catch (e) {
+                console.error('خطأ في تحليل بيانات المراحل:', e);
+                return;
+            }
+        
+            const stage = stages.find(s => s.name.trim() === selectedStage);
+            if (stage && stage.date) {
+                stageDateDisplay.textContent = stage.date;
+            } else {
+                stageDateDisplay.textContent = "غير متوفر";
+            }
+        }
         function loadShootersForStage() {
             const shootersList = document.getElementById('shootersList');
             const teamFilter = document.getElementById('team-filter');
@@ -954,115 +992,160 @@
           console.log("Selected shooter ID:", currentShooter.id, "Name:", currentShooter.firstName + " " + (currentShooter.lastName || ''), "Team:", currentShooter.team);
           showPage('add-score-page');
         }
-        
-        function loadScoreDetails() {
-            if (currentShooter && currentStage) {
-                const shooterName = document.getElementById('shooter-name');
-                const stageName = document.getElementById('stage-name');
-                const scoreProgress = document.getElementById('score-progress');
-                const scoreTable = document.getElementById('scoreTable');
-                const proceduralsInput = document.getElementById('procedurals');
-                const manualTimeInput = document.getElementById('manualTimeInput');
-        
-                if (shooterName) shooterName.textContent = `${currentShooter.firstName} ${currentShooter.lastName || ''}`;
-                if (stageName) stageName.textContent = currentStage.name;
-        
-                const targetCount = parseInt(currentStage.targets, 10) || 0;
-                if (targetCount <= 0) {
-                    alert('عدد الأهداف غير صالح. يرجى التحقق من إعدادات المرحلة.');
-                    return;
-                }
-                if (scoreProgress) scoreProgress.textContent = `0/${targetCount}`;
-        
-                // استرجاع النتائج المحفوظة من localStorage
-                let shooterScores = [];
-                try {
-                    const scoresData = localStorage.getItem('shooterScores');
-                    shooterScores = scoresData ? JSON.parse(scoresData) : [];
-                } catch (e) {
-                    console.error('خطأ في تحميل بيانات النتائج:', e);
-                }
-        
-                const existingScore = shooterScores.find(score => 
-                    score.shooterId === currentShooter.id && score.stageId === currentStage.name
-                );
-        
-                // إعداد الجدول
-                if (scoreTable) {
-                    scoreTable.innerHTML = '';
-                    const thead = document.createElement('thead');
-                    const headerRow = document.createElement('tr');
-                    const headers = ['T', 'A', 'C', 'D', 'M', 'NS'];
-                    headers.forEach(header => {
-                        const th = document.createElement('th');
-                        th.textContent = header;
-                        headerRow.appendChild(th);
-                    });
-                    thead.appendChild(headerRow);
-                    scoreTable.appendChild(thead);
-        
-                    const tbody = document.createElement('tbody');
-                    for (let i = 1; i <= targetCount; i++) {
-                        const row = document.createElement('tr');
-                        const targetNumCell = document.createElement('td');
-                        targetNumCell.textContent = i;
-                        row.appendChild(targetNumCell);
-        
-                        ['A', 'C', 'D', 'M', 'NS'].forEach(type => {
-                            const td = document.createElement('td');
-                            const button = document.createElement('button');
-                            button.className = `score-btn ${type === 'NS' ? 'no-shoot' : ''}`;
-                            button.dataset.target = i;
-                            button.dataset.type = type;
-        
-                            // تحميل النتائج المحفوظة إذا وجدت
-                            let savedValue = 0;
-                            if (existingScore && existingScore.scores) {
-                                const targetScore = existingScore.scores.find(s => s.target === i);
-                                if (targetScore) savedValue = targetScore[type] || 0;
-                            }
-                            button.textContent = savedValue;
-                            if (savedValue === 1) button.classList.add('active-1');
-                            else if (savedValue === 2) button.classList.add('active-2');
-        
-                            button.addEventListener('click', (e) => {
-                                e.preventDefault();
-                                incrementScore(button, type, i);
-                            });
-        
-                            let holdTimeout = null;
-                            button.addEventListener('mousedown', () => {
-                                holdTimeout = setTimeout(() => {
-                                    button.textContent = '0';
-                                    button.classList.remove('active-1', 'active-2');
-                                    updateScore();
-                                }, 1000);
-                            });
-                            button.addEventListener('mouseup', () => clearTimeout(holdTimeout));
-                            button.addEventListener('mouseleave', () => clearTimeout(holdTimeout));
-        
-                            td.appendChild(button);
-                            row.appendChild(td);
-                        });
-                        tbody.appendChild(row);
-                    }
-                    scoreTable.appendChild(tbody);
-                }
-        
-                // تحميل الوقت وعدد الإجراءات المحفوظة
-                resetTimer(); // إعادة تعيين التايمر أولاً
-                if (existingScore) {
-                    timerSeconds = parseFloat(existingScore.time) || 0;
-                    const timerDisplay = document.getElementById('timerDisplay');
-                    if (timerDisplay) timerDisplay.textContent = timerSeconds.toFixed(2);
-                    if (manualTimeInput) manualTimeInput.value = timerSeconds.toFixed(2);
-                    if (proceduralsInput) proceduralsInput.value = existingScore.procedurals || 0;
-                }
-        
-                updateScore(); // تحديث النتيجة بناءً على البيانات المحملة
+        function updateStageDate() {
+            const stageFilter = document.getElementById('stage-filter');
+            const stageDateDisplay = document.getElementById('stage-date-display');
+            if (!stageFilter || !stageDateDisplay) {
+                console.error('عنصر فلتر المراحل أو عنصر عرض التاريخ غير موجود!');
+                return;
             }
-        }   
-
+        
+            const selectedStage = stageFilter.value.trim();
+            if (selectedStage === "") {
+                stageDateDisplay.textContent = "";
+                return;
+            }
+        
+            let stages = [];
+            try {
+                const stagesData = localStorage.getItem('stages');
+                stages = stagesData ? JSON.parse(stagesData) : [];
+            } catch (e) {
+                console.error('خطأ في تحليل بيانات المراحل:', e);
+                return;
+            }
+        
+            const stage = stages.find(s => s.name.trim() === selectedStage);
+            if (stage && stage.date) {
+                stageDateDisplay.textContent = stage.date;
+            } else {
+                stageDateDisplay.textContent = "غير متوفر";
+            }
+        }
+        function loadScoreDetails() {
+            if (!currentShooter || !currentStage) {
+                console.error('currentShooter أو currentStage غير معرفين!');
+                alert('يرجى التأكد من اختيار رامي ومرحلة قبل إدخال النتائج.');
+                showPage('stage-detail-page');
+                return;
+            }
+        
+            const shooterName = document.getElementById('shooter-name');
+            const stageName = document.getElementById('stage-name');
+            const stageDateInScore = document.getElementById('stage-date-in-score');
+            const scoreProgress = document.getElementById('score-progress');
+            const scoreTable = document.getElementById('scoreTable');
+            const proceduralsInput = document.getElementById('procedurals');
+            const manualTimeInput = document.getElementById('manualTimeInput');
+        
+            if (shooterName) {
+                shooterName.textContent = `${currentShooter.firstName} ${currentShooter.lastName || ''}`;
+            } else {
+                console.error('عنصر shooter-name غير موجود!');
+            }
+        
+            if (stageName) {
+                stageName.textContent = currentStage.name || 'غير متوفر';
+            } else {
+                console.error('عنصر stage-name غير موجود!');
+            }
+        
+            if (stageDateInScore) {
+                stageDateInScore.textContent = currentStage.date ? currentStage.date : "غير متوفر";
+            } else {
+                console.error('عنصر stage-date-in-score غير موجود!');
+            }
+        
+            const targetCount = parseInt(currentStage.targets, 10) || 0;
+            if (targetCount <= 0) {
+                alert('عدد الأهداف غير صالح. يرجى التحقق من إعدادات المرحلة.');
+                return;
+            }
+            if (scoreProgress) scoreProgress.textContent = `0/${targetCount}`;
+        
+            let shooterScores = [];
+            try {
+                const scoresData = localStorage.getItem('shooterScores');
+                shooterScores = scoresData ? JSON.parse(scoresData) : [];
+            } catch (e) {
+                console.error('خطأ في تحميل بيانات النتائج:', e);
+            }
+        
+            const existingScore = shooterScores.find(score => 
+                score.shooterId === currentShooter.id && score.stageId === currentStage.name
+            );
+        
+            if (scoreTable) {
+                scoreTable.innerHTML = '';
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                const headers = ['T', 'A', 'C', 'D', 'M', 'NS'];
+                headers.forEach(header => {
+                    const th = document.createElement('th');
+                    th.textContent = header;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                scoreTable.appendChild(thead);
+        
+                const tbody = document.createElement('tbody');
+                for (let i = 1; i <= targetCount; i++) {
+                    const row = document.createElement('tr');
+                    const targetNumCell = document.createElement('td');
+                    targetNumCell.textContent = i;
+                    row.appendChild(targetNumCell);
+        
+                    ['A', 'C', 'D', 'M', 'NS'].forEach(type => {
+                        const td = document.createElement('td');
+                        const button = document.createElement('button');
+                        button.className = `score-btn ${type === 'NS' ? 'no-shoot' : ''}`;
+                        button.dataset.target = i;
+                        button.dataset.type = type;
+        
+                        let savedValue = 0;
+                        if (existingScore && existingScore.scores) {
+                            const targetScore = existingScore.scores.find(s => s.target === i);
+                            if (targetScore) savedValue = targetScore[type] || 0;
+                        }
+                        button.textContent = savedValue;
+                        if (savedValue === 1) button.classList.add('active-1');
+                        else if (savedValue === 2) button.classList.add('active-2');
+        
+                        button.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            incrementScore(button, type, i);
+                        });
+        
+                        let holdTimeout = null;
+                        button.addEventListener('mousedown', () => {
+                            holdTimeout = setTimeout(() => {
+                                button.textContent = '0';
+                                button.classList.remove('active-1', 'active-2');
+                                updateScore();
+                            }, 1000);
+                        });
+                        button.addEventListener('mouseup', () => clearTimeout(holdTimeout));
+                        button.addEventListener('mouseleave', () => clearTimeout(holdTimeout));
+        
+                        td.appendChild(button);
+                        row.appendChild(td);
+                    });
+                    tbody.appendChild(row);
+                }
+                scoreTable.appendChild(tbody);
+            }
+        
+            resetTimer();
+            if (existingScore) {
+                timerSeconds = parseFloat(existingScore.time) || 0;
+                const timerDisplay = document.getElementById('timerDisplay');
+                if (timerDisplay) timerDisplay.textContent = timerSeconds.toFixed(2);
+                if (manualTimeInput) manualTimeInput.value = timerSeconds.toFixed(2);
+                if (proceduralsInput) proceduralsInput.value = existingScore.procedurals || 0;
+            }
+        
+            updateScore();
+        }
         function incrementScore(button, type, targetId) {
             const row = button.closest('tr');
             let totalHits = 0;
@@ -1366,7 +1449,6 @@
             }
         }
 
-        
         function saveShooterScore() {
             if (!currentShooter || !currentStage || !timerSeconds) {
                 alert("يرجى التأكد من اختيار رامي ومرحلة وتسجيل وقت!");
@@ -1409,6 +1491,33 @@
             } catch (e) {
                 console.error('خطأ في تحميل بيانات النتائج:', e);
             }
+        
+            const existingStageScores = shooterScores.filter(score => score.stageId === currentStage.name);
+            const isFirstScoreForStage = existingStageScores.length === 0;
+        
+            let stages = [];
+            try {
+                const stagesData = localStorage.getItem('stages');
+                stages = stagesData ? JSON.parse(stagesData) : [];
+            } catch (e) {
+                console.error('خطأ في تحميل بيانات المراحل:', e);
+            }
+        
+            if (isFirstScoreForStage) {
+                const currentDate = new Date().toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                }).replace(/\//g, '/');
+        
+                const stageIndex = stages.findIndex(stage => stage.name === currentStage.name);
+                if (stageIndex !== -1) {
+                    stages[stageIndex].date = currentDate;
+                    localStorage.setItem('stages', JSON.stringify(stages));
+                    currentStage.date = currentDate;
+                }
+            }
+        
             const existingScoreIndex = shooterScores.findIndex(score => 
                 score.shooterId === currentShooter.id && score.stageId === currentStage.name
             );
@@ -1423,8 +1532,20 @@
             localStorage.setItem('shooterScores', JSON.stringify(shooterScores));
             console.log("Saved score:", shooterScore);
             console.log("All shooter scores:", shooterScores);
+            
+            
+            const stageName = document.getElementById('stage-name');
+            const stageDateInScore = document.getElementById('stage-date-in-score');
+            if (stageName) {
+                stageName.textContent = currentStage.name || 'غير متوفر';
+            }
+            if (stageDateInScore) {
+                stageDateInScore.textContent = currentStage.date ? currentStage.date : "غير متوفر";
+            }
+        
             showPage('stage-detail-page');
         }
+       
         function showAddStagePage() {
             editingStageIndex = null;
             const stageName = document.getElementById('stageName');
@@ -1493,7 +1614,12 @@
                 alert('الرجاء إدخال عدد صحيح للأهداف (أكبر من أو يساوي 0)');
                 return;
             }
-
+            // إضافة التاريخ عند إنشاء المرحلة (التاريخ الحالي كقيمة افتراضية)
+            const currentDate = new Date().toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                }).replace(/\//g, '/');
             const stageData = {
                 name: stageName ? stageName.value || `Stage ${JSON.parse(localStorage.getItem('stages') || '[]').length + 1}` : `Stage ${JSON.parse(localStorage.getItem('stages') || '[]').length + 1}`,
                 rounds: stageRounds ? parseInt(stageRounds.value, 10) || 0 : 0,
@@ -1522,6 +1648,7 @@
         }
 
         function previewStageImage(event) {
+
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -1544,33 +1671,33 @@
                 console.warn('لم يتم تحديد أي ملف للصورة.');
             }
         }
-
         function loadStageFilter() {
             const stageFilter = document.getElementById('stage-filter');
             if (!stageFilter) {
-                console.error('عنصر فلتر المراحل غير موجود!');
-                return;
-            }
+        console.error('عنصر فلتر المراحل غير موجود!');
+        return;
+    }
             stageFilter.innerHTML = '<option value="">الكل</option>';
             let stages = [];
             try {
-                const stagesData = localStorage.getItem('stages');
-                stages = stagesData ? JSON.parse(stagesData) : [];
-            } catch (e) {
+        const stagesData = localStorage.getItem('stages');
+        stages = stagesData ? JSON.parse(stagesData) : [];
+    } catch (e) {
                 console.error('خطأ في تحليل بيانات المراحل:', e);
                 return;
             }
             if (stages.length === 0) {
-                console.warn('لا توجد مراحل محفوظة لتحميلها في الفلتر.');
-                return;
-            }
+        console.warn('لا توجد مراحل محفوظة لتحميلها في الفلتر.');
+        return;
+    }
             stages.forEach(stage => {
                 const option = document.createElement('option');
-                option.value = stage.name.trim(); // التأكد من إزالة المسافات الزائدة
+                option.value = stage.name.trim();
                 option.textContent = stage.name || `المرحلة ${stages.indexOf(stage) + 1}`;
                 stageFilter.appendChild(option);
             });
             console.log("تم تحميل خيارات فلتر المراحل:", stageFilter.innerHTML);
+            updateStageDate(); // تحديث التاريخ بعد تحميل المراحل
         }
 
         function loadResults() {
@@ -1581,7 +1708,7 @@
                 return;
             }
             resultsTable.innerHTML = '';
-
+        
             let shooterScores = [];
             let shooters = [];
             let stages = [];
@@ -1597,53 +1724,51 @@
                 resultsTable.innerHTML = '<tr><td colspan="6">خطأ في تحميل البيانات.</td></tr>';
                 return;
             }
-
+        
             console.log("البيانات المحملة - shooterScores:", shooterScores);
             console.log("البيانات المحملة - shooters:", shooters);
             console.log("البيانات المحملة - stages:", stages);
-
+        
             if (shooterScores.length === 0) {
                 console.warn('لا توجد نتائج محفوظة في shooterScores.');
                 resultsTable.innerHTML = '<tr><td colspan="6">لا توجد نتائج محفوظة بعد.</td></tr>';
                 return;
             }
-
+        
             const selectedStage = stageFilter.value.trim();
-            console.log("المرحلة المختارة من الفلتر:", selectedStage);
+    console.log("المرحلة المختارة من الفلتر:", selectedStage);
 
-            let filteredScores = selectedStage === "" 
-                ? shooterScores 
-                : shooterScores.filter(score => score.stageId.trim() === selectedStage);
-
+    let filteredScores = selectedStage === "" 
+        ? shooterScores 
+        : shooterScores.filter(score => score.stageId.trim() === selectedStage);
+        
             console.log("النتائج بعد التصفية:", filteredScores);
-
+        
             if (filteredScores.length === 0) {
                 console.warn('لا توجد نتائج متطابقة مع المرحلة المختارة:', selectedStage);
                 resultsTable.innerHTML = '<tr><td colspan="6">لا توجد نتائج لهذه المرحلة.</td></tr>';
                 return;
             }
-
+        
             const uniqueScores = [];
             const scoreMap = new Map();
             filteredScores.forEach(score => {
-                const key = `${score.shooterId}-${score.stageId}`;
-                if (!scoreMap.has(key) || parseFloat(score.hitFactor) > parseFloat(scoreMap.get(key).hitFactor)) {
-                    scoreMap.set(key, score);
-                }
-            });
+        const key = `${score.shooterId}-${score.stageId}`;
+        if (!scoreMap.has(key) || parseFloat(score.hitFactor) > parseFloat(scoreMap.get(key).hitFactor)) {
+            scoreMap.set(key, score);
+        }
+    });
             uniqueScores.push(...scoreMap.values());
-
+        
             uniqueScores.sort((a, b) => parseFloat(b.hitFactor) - parseFloat(a.hitFactor));
 
-            console.log("النتائج الفريدة بعد الترتيب:", uniqueScores);
+    console.log("النتائج الفريدة بعد الترتيب:", uniqueScores);
 
-            // حساب أعلى hitFactor بين النتائج المصفاة
-            const maxHitFactor = Math.max(...uniqueScores.map(score => parseFloat(score.hitFactor)), 0);
-            console.log("أعلى Hit Factor:", maxHitFactor);
+    const maxHitFactor = Math.max(...uniqueScores.map(score => parseFloat(score.hitFactor)), 0);
+    console.log("أعلى Hit Factor:", maxHitFactor);
 
-            uniqueScores.forEach(score => {
-                const shooter = shooters.find(s => s.id.toString() === score.shooterId.toString());
-                // إعادة حساب النسبة المئوية بناءً على أعلى hitFactor
+    uniqueScores.forEach(score => {
+        const shooter = shooters.find(s => s.id.toString() === score.shooterId.toString());
                 const hitFactor = parseFloat(score.hitFactor) || 0;
                 const percentage = maxHitFactor > 0 ? ((hitFactor / maxHitFactor) * 100).toFixed(2) : '0.00';
                 
@@ -1670,7 +1795,7 @@
                 }
                 resultsTable.appendChild(row);
             });
-
+        
             console.log("تم تحميل النتائج في الجدول بنجاح!");
         }
                 
@@ -1848,7 +1973,6 @@
                 const hitFactor = parseFloat(score.hitFactor) || 0;
                 const percentage = maxHitFactor > 0 ? ((hitFactor / maxHitFactor) * 100).toFixed(1) : '0.00';
         
-                // حساب إجمالي النتائج لكل نوع (A, C, D, M, NS)
                 let totals = { A: 0, C: 0, D: 0, M: 0, NS: 0 };
                 if (score.scores && Array.isArray(score.scores)) {
                     score.scores.forEach(target => {
@@ -1893,6 +2017,8 @@
                 }
                 detailsTable.appendChild(row);
             });
+        
+            updateStageDateDetails(); // تحديث التاريخ بعد تحميل التفاصيل
         }
 
         function shareShootingDetails() {
