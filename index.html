@@ -632,6 +632,7 @@
         let timerInterval = null;
         let timerSeconds = 0;
         let isTimerRunning = false;
+        let startTime = 0;
         let editingStageIndex = null;
         let editingShooterIndex = null;
         let currentStageImage = null;
@@ -1234,63 +1235,111 @@
 
         function toggleTimer() {
             const toggleBtn = document.getElementById('toggleTimerBtn');
-            const manualTimeInput = document.getElementById('manualTimeInput'); // الحصول على حقل الإدخال
-            if (!toggleBtn) {
-                console.error('زر Toggle Timer غير موجود');
-                return;
-            }
-            if (!manualTimeInput) {
-                console.error('حقل manualTimeInput غير موجود');
-                return;
-            }        
-
-            if (!isTimerRunning) {
-                // بدء التايمر
-                timerInterval = setInterval(() => {
-                    timerSeconds += 0.01; // زيادة الوقت بمقدار 0.01 ثانية
-                    const timerDisplay = document.getElementById('timerDisplay');
-                    if (timerDisplay) {
-                        timerDisplay.textContent = timerSeconds.toFixed(2); // تحديث العرض
-                    }
-                    updateScore(); // تحديث النتيجة بناءً على الوقت
-                }, 10); // تحديث كل 10 مللي ثانية
-                toggleBtn.textContent = translations[currentLang].start === "تشغيل" ? "إيقاف" : "Stop";
-                toggleBtn.style.backgroundColor = '#dc3545'; // لون أحمر للإيقاف
-                isTimerRunning = true;
-            } else {
-                // إيقاف التايمر
+            const manualInput = document.getElementById('manualTimeInput');
+        
+            if (isTimerRunning) {
+                // --- إيقاف المؤقت ---
                 clearInterval(timerInterval);
-                timerInterval = null;
-                const timerDisplay = document.getElementById('timerDisplay');
-                if (timerDisplay) {
-                    timerDisplay.textContent = timerSeconds.toFixed(2); // تثبيت الوقت الحالي
-                }
-                // تسجيل الوقت في حقل الإدخال
-                manualTimeInput.value = timerSeconds.toFixed(2); // تحديث حقل الإدخال بالوقت النهائي
-                toggleBtn.textContent = translations[currentLang].start; // "تشغيل" أو "Start"
-                toggleBtn.style.backgroundColor = '#007bff'; // لون أزرق للتشغيل
                 isTimerRunning = false;
-                updateScore(); // تحديث النتيجة النهائية بعد الإيقاف
+                toggleBtn.textContent = translations[currentLang].start; // أو "تشغيل"
+                toggleBtn.style.backgroundColor = '#30336b'; // لون زر البدء الأصلي
+        
+                // احسب وسجل الوقت المنقضي الدقيق عند التوقف
+                if (startTime) { // تأكد من أن المؤقت قد بدأ بالفعل
+                    const elapsedMilliseconds = Date.now() - startTime;
+                    timerSeconds = elapsedMilliseconds / 1000;
+                }
+                // قم بتحديث العرض والقيمة اليدوية للمرة الأخيرة
+                updateTimerDisplay();
+                 // تحديث النتيجة النهائية إذا كانت تعتمد على الوقت
+                 updateScore();
+        
+            } else {
+                // --- بدء المؤقت ---
+                // احسب وقت البدء، مع مراعاة الوقت المنقضي بالفعل إذا كان المؤقت متوقفًا مؤقتًا
+                // timerSeconds هنا هو الوقت الذي توقف عنده المؤقت آخر مرة أو تم إدخاله يدويًا
+                startTime = Date.now() - (timerSeconds * 1000);
+        
+                timerInterval = setInterval(() => {
+                    // احسب الوقت المنقضي الكلي منذ البدء
+                    const elapsedMilliseconds = Date.now() - startTime;
+                    timerSeconds = elapsedMilliseconds / 1000;
+                    updateTimerDisplay(); // تحديث العرض بشكل مستمر
+                }, 100); // تحديث العرض 10 مرات في الثانية لدقة وسلاسة أفضل
+        
+                isTimerRunning = true;
+                toggleBtn.textContent = 'إيقاف'; // أو استخدم translations[currentLang].stop إذا أضفتها
+                toggleBtn.style.backgroundColor = '#dc3545'; // لون زر الإيقاف
             }
         }
-        function updateManualTime(input) {
-            let value = input.value.replace(/[^0-9.]/g, ''); // إزالة أي أحرف غير رقمية أو نقطة
-            if (value.length > 2 && !value.includes('.')) {
-                value = value.slice(0, 2) + '.' + value.slice(2); // إضافة النقطة تلقائيًا
+
+        // استبدل الدالة resetTimer بالكامل بهذه النسخة المعدلة
+                function resetTimer() {
+            clearInterval(timerInterval); // أوقف المؤقت إذا كان يعمل
+            timerSeconds = 0;
+            startTime = 0; // إعادة تعيين وقت البدء
+            isTimerRunning = false;
+        
+            document.getElementById('timerDisplay').textContent = '00.00';
+            const toggleBtn = document.getElementById('toggleTimerBtn');
+            toggleBtn.textContent = translations[currentLang].start; // أو "تشغيل"
+            toggleBtn.style.backgroundColor = '#30336b'; // إعادة لون زر البدء
+        
+            // مسح حقل الإدخال اليدوي
+            const manualInput = document.getElementById('manualTimeInput');
+            if (manualInput) {
+                 manualInput.value = '';
             }
-            if (value.length > 5) value = value.slice(0, 5); // الحد الأقصى 99.99
-            const [seconds, milliseconds] = value.split('.').map(Number);
-            if (seconds > 99 || (milliseconds > 99 && milliseconds !== undefined)) value = '99.99';
-            input.value = value;
-            timerSeconds = parseFloat(value) || 0; // تحديث timerSeconds بناءً على الإدخال
-            document.getElementById('timerDisplay').textContent = timerSeconds.toFixed(2); // تحديث العرض
-            updateScore(); // تحديث النتيجة
+        
+            updateScore(); // أعد حساب النتيجة لأن الوقت تغير
+        }
+        
+        // استبدل الدالة updateTimerDisplay بهذه النسخة
+        // (تحديث بسيط لإضافة تحديث حقل الإدخال اليدوي)
+        function updateTimerDisplay() {
+            const display = document.getElementById('timerDisplay');
+            // استخدم timerSeconds مباشرة وقم بتنسيقها لمنزلتين عشريتين
+            display.textContent = timerSeconds.toFixed(2);        
+
+            // قم بتحديث حقل الإدخال اليدوي ليعكس قيمة المؤقت الحالية
+            const manualInput = document.getElementById('manualTimeInput');
+            if (manualInput) {
+                 // يفضل تحديث الحقل اليدوي فقط عندما لا يكون المؤقت قيد التشغيل أو عند التوقف/الريست
+                 // لتجنب التعارض مع كتابة المستخدم. لكن للتبسيط، سنحدثه دائمًا هنا.
+                 // إذا واجهت مشاكل، يمكن تعديل هذا الشرط.
+                 manualInput.value = timerSeconds.toFixed(2);
+            }
+             // تحديث النتيجة بشكل مستمر إذا كانت تعتمد على الوقت
+             // قد يكون من الأفضل استدعاء updateScore() فقط عند الإيقاف أو الريست أو الإدخال اليدوي
+             // لتجنب الحسابات المتكررة. قم بإزالة السطر التالي إذا أردت ذلك.
+             updateScore();
+        }        
+
+        function updateManualTime(input) {
+            // أوقف المؤقت إذا كان يعمل عند إدخال الوقت يدويًا
+            if (isTimerRunning) {
+                toggleTimer(); // استدعاء toggle لإيقافه بشكل صحيح
+            }        
+
+            // تأكد من التعامل مع القيمة المدخلة كرقم
+            let manualTime = parseFloat(input.value);        
+
+            // تحقق إذا كانت القيمة غير صالحة أو سالبة
+            if (isNaN(manualTime) || manualTime < 0) {
+                manualTime = 0; // استخدم 0 كقيمة افتراضية
+                input.value = manualTime.toFixed(2); // قم بتحديث الحقل بالقيمة المصححة
+            }        
+
+            timerSeconds = manualTime; // قم بتعيين الوقت المنقضي بالقيمة اليدوية
+            startTime = 0; // أعد تعيين وقت البدء لأن الوقت اليدوي يتجاوز منطق المؤقت
+            updateTimerDisplay(); // قم بتحديث العرض بناءً على الإدخال اليدوي
+            updateScore(); // أعد حساب النتيجة
         }
         function resetTimer() {
             if (timerInterval) {
         clearInterval(timerInterval); // إيقاف التايمر إذا كان يعمل
         timerInterval = null;
-    }
+          }
             timerSeconds = 0;
             const timerDisplay = document.getElementById('timerDisplay');
             if (timerDisplay) timerDisplay.textContent = '00.00';
